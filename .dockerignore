@@ -1,0 +1,93 @@
+# Docker构建忽略文件
+
+# Git相关
+.git
+.gitignore
+.gitattributes
+
+# Python缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+
+# 数据文件（保留结构）
+data/*
+!data/.gitkeep
+
+# 模型文件（保留结构）
+models/*
+!models/.gitkeep
+
+# 图片文件（保留结构）
+plots/*
+!plots/.gitkeep
+
+# 测试覆盖率
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# 临时文件
+*.tmp
+*.temp
+
+# Docker相关
+.dockerignore
+
+# 文档构建
+docs/_build/
+
+# MLflow实验
+mlruns/
+
+# 开发相关
+.env
+.env.local
+
+# 大文件
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib

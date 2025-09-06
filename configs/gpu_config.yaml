@@ -1,0 +1,158 @@
+# GPU优化配置文件 - 针对NVIDIA 4090 + CUDA 12.4
+
+# 数据配置 - 针对高端GPU优化
+data:
+  batch_size: 128  # 4090显存充足，可以使用更大的批次
+  test_size: 0.2
+  random_state: 42
+  preprocessing:
+    scale_features: true
+    handle_missing: "mean"
+    encode_categorical: true
+    scaler: "standard"
+    feature_selection_k: 100  # 更多特征用于GPU加速
+
+# GPU加速模型配置
+models:
+  # 传统ML模型（CPU）
+  random_forest:
+    n_estimators: 200  # 更多树
+    max_depth: null
+    random_state: 42
+    n_jobs: -1  # 使用所有CPU核心
+  
+  logistic_regression:
+    max_iter: 2000
+    random_state: 42
+    solver: "liblinear"
+  
+  # PyTorch神经网络配置
+  pytorch_neural_network:
+    hidden_layers: [512, 256, 128]  # 更深的网络
+    activation: "relu"
+    optimizer: "adam"
+    learning_rate: 0.001
+    epochs: 200
+    device: "cuda"  # 强制使用GPU
+    batch_size: 128
+    dropout: 0.2
+  
+  # TensorFlow模型配置
+  tensorflow_neural_network:
+    hidden_layers: [512, 256, 128]
+    activation: "relu"
+    optimizer: "adam"
+    learning_rate: 0.001
+    epochs: 200
+    use_gpu: true
+    mixed_precision: true  # 使用混合精度训练
+
+# GPU优化训练配置
+training:
+  epochs: 200
+  early_stopping: true
+  patience: 20
+  validation_split: 0.2
+  cross_validation:
+    enabled: true
+    folds: 5
+  
+  # GPU特定设置
+  gpu_settings:
+    device: "cuda"
+    mixed_precision: true
+    gradient_clipping: 1.0
+    accumulate_gradients: 1
+    pin_memory: true
+    num_workers: 4
+
+# 评估配置
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "roc_auc"]
+  regression_metrics: ["mse", "mae", "r2", "mape"]
+  save_predictions: true
+  confusion_matrix: true
+  
+  # GPU加速评估
+  gpu_evaluation: true
+  batch_evaluation: true
+
+# 可视化配置 - 高分辨率
+visualization:
+  figure_size: [12, 10]
+  dpi: 300
+  style: "seaborn-v0_8"
+  save_plots: true
+  plot_format: "png"
+  plots_dir: "plots"
+  
+  # 高质量可视化
+  high_quality: true
+  vector_graphics: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/ml_framework_gpu.log"
+  
+  # GPU相关日志
+  log_gpu_usage: true
+  log_memory_usage: true
+
+# 实验跟踪配置
+tracking:
+  enabled: true
+  backend: "mlflow"
+  experiment_name: "ml_framework_gpu_experiments"
+  auto_log: true
+  
+  # GPU指标跟踪
+  track_gpu_metrics: true
+  track_memory_usage: true
+
+# 路径配置
+paths:
+  data_dir: "data"
+  models_dir: "models"
+  logs_dir: "logs"
+  plots_dir: "plots"
+  
+  # GPU模型特定路径
+  gpu_models_dir: "models/gpu"
+  checkpoints_dir: "checkpoints"
+
+# GPU性能优化设置
+gpu_optimization:
+  # CUDA设置
+  cuda_settings:
+    device: "cuda:0"  # 使用第一个GPU
+    memory_fraction: 0.9  # 使用90%显存
+    allow_growth: true
+    clear_cache_frequency: 10  # 每10个epoch清理缓存
+  
+  # PyTorch优化
+  pytorch_settings:
+    backends_cudnn_benchmark: true
+    backends_cudnn_deterministic: false
+    autograd_set_detect_anomaly: false
+    jit_compilation: true
+  
+  # TensorFlow优化
+  tensorflow_settings:
+    allow_soft_placement: true
+    log_device_placement: false
+    inter_op_parallelism_threads: 0
+    intra_op_parallelism_threads: 0
+    mixed_precision_policy: "mixed_float16"
+
+# 监控设置
+monitoring:
+  gpu_monitoring: true
+  memory_monitoring: true
+  temperature_monitoring: true
+  power_monitoring: true
+  
+  # 警告阈值
+  memory_warning_threshold: 0.85  # 85%显存使用率警告
+  temperature_warning_threshold: 80  # 80°C温度警告

@@ -1,0 +1,51 @@
+# ML Framework 生产环境Dockerfile
+# 优化的轻量级GPU加速镜像
+
+FROM nvidia/cuda:12.4-runtime-ubuntu22.04
+
+# 环境变量
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PATH=/usr/local/bin:$PATH
+
+# 安装Python和基础依赖
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    python3.11-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建符号链接
+RUN ln -s /usr/bin/python3.11 /usr/bin/python
+
+# 设置工作目录
+WORKDIR /app
+
+# 只复制必要文件
+COPY requirements.txt setup.py ./
+COPY src/ src/
+COPY configs/ configs/
+
+# 安装核心依赖
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 \
+    --index-url https://download.pytorch.org/whl/cu124 && \
+    pip install --no-cache-dir \
+    tensorflow==2.15.0 \
+    numpy pandas scikit-learn \
+    flask fastapi uvicorn \
+    pyyaml click joblib && \
+    pip install -e . && \
+    rm -rf ~/.cache/pip
+
+# 创建用户
+RUN useradd -m -u 1000 mluser && chown -R mluser:mluser /app
+USER mluser
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动命令
+CMD ["python", "-m", "ml_framework.cli", "api"]

@@ -1,0 +1,109 @@
+# ML Framework Docker Compose配置
+# 支持GPU加速的机器学习框架部署
+
+version: '3.8'
+
+services:
+  # 主ML框架服务
+  ml-framework:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ml-framework:latest
+    container_name: ml-framework-main
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONPATH=/app/src
+    volumes:
+      # 数据卷
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - ./plots:/app/plots
+      # 配置文件
+      - ./configs:/app/configs
+      # 用户自定义脚本
+      - ./examples:/app/examples
+    ports:
+      - "8000:8000"  # FastAPI
+      - "8888:8888"  # Jupyter
+      - "8501:8501"  # Streamlit
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["shell"]
+    stdin_open: true
+    tty: true
+
+  # Jupyter Notebook服务
+  jupyter:
+    extends: ml-framework
+    container_name: ml-framework-jupyter
+    ports:
+      - "8888:8888"
+    command: ["jupyter"]
+    
+  # FastAPI服务
+  api:
+    extends: ml-framework
+    container_name: ml-framework-api
+    ports:
+      - "8000:8000"
+    command: ["api"]
+    
+  # Streamlit应用
+  streamlit:
+    extends: ml-framework
+    container_name: ml-framework-streamlit
+    ports:
+      - "8501:8501"
+    command: ["streamlit"]
+
+  # MLflow跟踪服务
+  mlflow:
+    extends: ml-framework
+    container_name: ml-framework-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/app/mlruns
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000"]
+
+  # Redis缓存（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: ml-framework-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # PostgreSQL数据库（可选）
+  postgres:
+    image: postgres:15-alpine
+    container_name: ml-framework-postgres
+    environment:
+      POSTGRES_DB: ml_framework
+      POSTGRES_USER: mluser
+      POSTGRES_PASSWORD: mlpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  redis_data:
+  postgres_data:
+
+# 网络配置
+networks:
+  default:
+    driver: bridge

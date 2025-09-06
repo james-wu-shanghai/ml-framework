@@ -1,0 +1,79 @@
+# ML Framework 默认配置
+
+# 数据配置
+data:
+  batch_size: 32
+  test_size: 0.2
+  random_state: 42
+  preprocessing:
+    scale_features: true
+    handle_missing: "mean"  # mean, median, mode, knn
+    encode_categorical: true
+    scaler: "standard"  # standard, minmax, robust
+    feature_selection_k: 50
+
+# 模型配置
+models:
+  random_forest:
+    n_estimators: 100
+    max_depth: null
+    random_state: 42
+    n_jobs: -1
+  
+  logistic_regression:
+    max_iter: 1000
+    random_state: 42
+    solver: "liblinear"
+  
+  neural_network:
+    hidden_layers: [128, 64]
+    activation: "relu"
+    optimizer: "adam"
+    learning_rate: 0.001
+    epochs: 100
+
+# 训练配置
+training:
+  epochs: 100
+  early_stopping: true
+  patience: 10
+  validation_split: 0.2
+  cross_validation:
+    enabled: true
+    folds: 5
+
+# 评估配置
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1"]
+  regression_metrics: ["mse", "mae", "r2"]
+  save_predictions: true
+  confusion_matrix: true
+
+# 可视化配置
+visualization:
+  figure_size: [10, 8]
+  dpi: 300
+  style: "seaborn"
+  save_plots: true
+  plot_format: "png"
+  plots_dir: "plots"
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/ml_framework.log"
+
+# 实验跟踪配置
+tracking:
+  enabled: true
+  backend: "mlflow"
+  experiment_name: "ml_framework_experiments"
+  auto_log: true
+
+# 路径配置
+paths:
+  data_dir: "data"
+  models_dir: "models"
+  logs_dir: "logs"
+  plots_dir: "plots"
