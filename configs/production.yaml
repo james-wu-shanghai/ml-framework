@@ -1,0 +1,225 @@
+# ML Framework 生产环境配置
+
+# 数据配置
+data:
+  batch_size: 64  # 生产环境使用更大的batch size
+  test_size: 0.2
+  random_state: 42
+  preprocessing:
+    scale_features: true
+    handle_missing: "mean"
+    encode_categorical: true
+    scaler: "standard"
+    feature_selection_k: 100  # 生产环境保留更多特征
+
+# 模型配置
+models:
+  random_forest:
+    n_estimators: 200  # 生产环境使用更多树
+    max_depth: 15
+    random_state: 42
+    n_jobs: -1
+  
+  logistic_regression:
+    max_iter: 2000  # 增加迭代次数确保收敛
+    random_state: 42
+    solver: "liblinear"
+    C: 1.0
+  
+  neural_network:
+    hidden_layers: [256, 128, 64]  # 更大的网络
+    activation: "relu"
+    optimizer: "adam"
+    learning_rate: 0.0001  # 更小的学习率
+    epochs: 200
+    batch_size: 128
+
+# 训练配置
+training:
+  epochs: 200  # 生产环境训练更多轮次
+  early_stopping: true
+  patience: 20  # 更大的耐心值
+  validation_split: 0.2
+  cross_validation:
+    enabled: true
+    folds: 10  # 更严格的交叉验证
+  
+  # GPU优化配置
+  gpu_optimization:
+    mixed_precision: true
+    gradient_clipping: 1.0
+    dataloader_workers: 4
+
+# 评估配置
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "auc"]
+  regression_metrics: ["mse", "mae", "r2", "mape"]
+  save_predictions: true
+  confusion_matrix: true
+  classification_report: true
+  
+  # 性能基准
+  performance_thresholds:
+    accuracy: 0.85
+    precision: 0.80
+    recall: 0.80
+    f1: 0.80
+
+# 可视化配置 (生产环境禁用)
+visualization:
+  enabled: false  # 生产环境不生成图表
+  save_plots: false
+
+# 日志配置
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - [%(process)d] - %(message)s"
+  handlers:
+    - type: "file"
+      filename: "/app/logs/ml_framework.log"
+      max_bytes: 52428800  # 50MB
+      backup_count: 10
+    - type: "console"
+      stream: "stdout"
+      level: "INFO"
+  
+  # 结构化日志
+  structured_logging:
+    enabled: true
+    format: "json"
+
+# 实验跟踪配置
+tracking:
+  enabled: true
+  backend: "mlflow"
+  tracking_uri: "http://mlflow:5000"  # MLflow服务地址
+  experiment_name: "ml_framework_production"
+  auto_log: true
+  
+  # 生产环境标签
+  tags:
+    environment: "production"
+    version: "v0.1.0"
+    cuda_version: "13.0"
+
+# API配置
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4  # 根据CPU核心数调整
+  timeout: 300  # 5分钟超时
+  keepalive: 2
+  
+  # 限流配置
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 1000
+    requests_per_hour: 10000
+  
+  # CORS配置
+  cors:
+    enabled: true
+    origins: ["https://your-domain.com"]
+    methods: ["GET", "POST"]
+    headers: ["*"]
+
+# 缓存配置
+cache:
+  enabled: true
+  backend: "redis"
+  redis_url: "redis://redis:6379/0"
+  ttl: 3600  # 1小时缓存
+  
+  # 缓存策略
+  strategies:
+    model_predictions: true
+    data_preprocessing: true
+    feature_extraction: false
+
+# 安全配置
+security:
+  # API密钥认证
+  api_key_auth:
+    enabled: true
+    header_name: "X-API-Key"
+  
+  # JWT认证
+  jwt_auth:
+    enabled: false
+    secret_key: "your-secret-key"
+    algorithm: "HS256"
+    expiration: 3600
+
+# 性能配置
+performance:
+  # 内存管理
+  memory:
+    max_memory_usage: "6GB"
+    garbage_collection: true
+    gc_threshold: 0.8
+  
+  # GPU内存管理
+  gpu:
+    memory_fraction: 0.8
+    allow_growth: true
+    memory_limit: "6GB"
+  
+  # 并发配置
+  concurrency:
+    max_workers: 8
+    thread_pool_size: 16
+    async_enabled: true
+
+# 监控配置
+monitoring:
+  metrics:
+    enabled: true
+    endpoint: "/metrics"
+    include_system_metrics: true
+    include_gpu_metrics: true
+  
+  health_check:
+    enabled: true
+    endpoint: "/health"
+    checks:
+      - "database"
+      - "gpu"
+      - "memory"
+      - "disk_space"
+  
+  # 告警配置
+  alerting:
+    enabled: true
+    cpu_threshold: 80
+    memory_threshold: 85
+    gpu_threshold: 90
+    disk_threshold: 85
+
+# 路径配置
+paths:
+  data_dir: "/app/data"
+  models_dir: "/app/models"
+  logs_dir: "/app/logs"
+  cache_dir: "/app/cache"
+  temp_dir: "/tmp/ml_framework"
+
+# 数据库配置 (如需要)
+database:
+  enabled: false
+  type: "postgresql"
+  host: "postgres"
+  port: 5432
+  database: "ml_framework"
+  username: "ml_user"
+  password: "secure_password"
+  pool_size: 10
+  max_overflow: 20
+
+# 特性开关
+features:
+  auto_scaling: true
+  model_versioning: true
+  a_b_testing: false
+  real_time_inference: true
+  batch_processing: true
+  distributed_training: false

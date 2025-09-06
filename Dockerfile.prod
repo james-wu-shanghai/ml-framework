@@ -1,7 +1,7 @@
 # ML Framework 生产环境Dockerfile
-# 优化的轻量级GPU加速镜像
+# 优化的轻量级GPU加速镜像 (CUDA 13.0支持)
 
-FROM nvidia/cuda:12.4-runtime-ubuntu22.04
+FROM nvidia/cuda:13.0-runtime-ubuntu22.04
 
 # 环境变量
 ENV DEBIAN_FRONTEND=noninteractive
@@ -27,16 +27,16 @@ COPY requirements.txt setup.py ./
 COPY src/ src/
 COPY configs/ configs/
 
-# 安装核心依赖
+# 安装核心依赖 (CUDA 13.0优化)
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir \
-    torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 \
-    --index-url https://download.pytorch.org/whl/cu124 && \
+    torch>=2.8.0 torchvision>=0.18.0 torchaudio>=2.8.0 \
+    --index-url https://download.pytorch.org/whl/cu130 && \
     pip install --no-cache-dir \
-    tensorflow==2.15.0 \
-    numpy pandas scikit-learn \
-    flask fastapi uvicorn \
-    pyyaml click joblib && \
+    tensorflow>=2.18.0 \
+    numpy>=1.26.0 pandas>=2.2.0 scikit-learn>=1.5.0 \
+    flask>=3.0.0 fastapi>=0.115.0 uvicorn>=0.32.0 \
+    pyyaml>=5.4.0 click>=8.0.0 joblib>=1.0.0 && \
     pip install -e . && \
     rm -rf ~/.cache/pip
 

@@ -39,6 +39,12 @@ ml-framework/
 │   └── 📄 default_config.yaml      # 默认配置
 ├── 📁 tests/                        # 测试代码
 ├── 📁 docs/                         # 文档
+│   ├── 📄 project_structure.md     # 项目结构说明（本文件）
+│   └── 📁 upgrades/               # 升级日志目录
+│       ├── 📄 README.md           # 升级日志索引
+│       ├── 📄 2025-09-06_CUDA_13_UPGRADE.md
+│       ├── 📄 2025-09-06_DOCKER_CUDA13_BUILD.md
+│       └── 📄 2025-09-06_PRODUCTION_CUDA13_DEPLOY.md
 ├── 📁 data/                         # 数据目录
 ├── 📁 models/                       # 模型保存目录
 ├── 📁 logs/                         # 日志目录

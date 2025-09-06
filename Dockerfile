@@ -1,8 +1,8 @@
 # ML Framework Docker镜像
-# 支持NVIDIA 4090 + CUDA 12.4的GPU加速机器学习框架
+# 支持NVIDIA GPU + CUDA 13.0的GPU加速机器学习框架
 
-# 使用NVIDIA官方CUDA基础镜像，支持CUDA 12.4
-FROM nvidia/cuda:12.4-devel-ubuntu22.04
+# 使用NVIDIA官方CUDA基础镜像，支持CUDA 13.0
+FROM nvidia/cuda:13.0-devel-ubuntu22.04
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive
@@ -69,33 +69,33 @@ RUN mkdir -p data models logs plots tests
 # 安装Python依赖 - 分阶段安装以优化缓存
 # 1. 安装核心依赖
 RUN pip install --no-cache-dir \
-    numpy>=1.21.0 \
-    pandas>=1.3.0 \
-    scikit-learn>=1.0.0 \
-    scipy>=1.7.0 \
-    matplotlib>=3.4.0 \
-    seaborn>=0.11.0 \
+    numpy>=1.26.0 \
+    pandas>=2.2.0 \
+    scikit-learn>=1.5.0 \
+    scipy>=1.14.0 \
+    matplotlib>=3.9.0 \
+    seaborn>=0.13.0 \
     pyyaml>=5.4.0 \
     click>=8.0.0 \
     joblib>=1.0.0 \
     tqdm>=4.61.0
 
-# 2. 安装PyTorch (CUDA 12.4支持)
+# 2. 安装PyTorch (CUDA 13.0支持)
 RUN pip install --no-cache-dir \
-    torch==2.2.0 \
-    torchvision==0.17.0 \
-    torchaudio==2.2.0 \
-    --index-url https://download.pytorch.org/whl/cu124
+    torch>=2.8.0 \
+    torchvision>=0.18.0 \
+    torchaudio>=2.8.0 \
+    --index-url https://download.pytorch.org/whl/cu130
 
-# 3. 安装TensorFlow (CUDA 12.4支持)
+# 3. 安装TensorFlow (CUDA 13.0支持)
 RUN pip install --no-cache-dir \
-    tensorflow==2.15.0 \
-    keras>=3.0.0
+    tensorflow>=2.18.0 \
+    keras>=3.6.0
 
 # 4. 安装数据处理和可视化库
 RUN pip install --no-cache-dir \
-    plotly>=5.0.0 \
-    bokeh>=2.3.0 \
+    plotly>=5.24.0 \
+    bokeh>=3.6.0 \
     openpyxl>=3.0.0 \
     xlrd>=2.0.0 \
     h5py>=3.1.0 \
@@ -105,25 +105,26 @@ RUN pip install --no-cache-dir \
 RUN pip install --no-cache-dir \
     shap>=0.39.0 \
     lime>=0.2.0 \
-    optuna>=2.8.0 \
-    mlflow>=1.18.0 \
-    wandb>=0.12.0 \
-    tensorboard>=2.6.0
+    optuna>=4.0.0 \
+    mlflow>=2.16.0 \
+    wandb>=0.18.0 \
+    tensorboard>=2.18.0
 
 # 6. 安装Web框架和部署工具
 RUN pip install --no-cache-dir \
-    flask>=2.0.0 \
-    fastapi>=0.68.0 \
-    uvicorn>=0.15.0 \
-    streamlit>=0.84.0
+    flask>=3.0.0 \
+    fastapi>=0.115.0 \
+    uvicorn>=0.32.0 \
+    streamlit>=1.40.0
 
 # 7. 安装开发工具
 RUN pip install --no-cache-dir \
-    pytest>=6.2.0 \
-    pytest-cov>=2.12.0 \
-    black>=21.6.0 \
-    jupyter>=1.0.0 \
-    ipykernel>=6.0.0
+    pytest>=8.3.0 \
+    pytest-cov>=6.0.0 \
+    black>=24.10.0 \
+    jupyter>=1.1.0 \
+    ipykernel>=6.29.0 \
+    ipywidgets>=8.1.0
 
 # 安装项目本身
 RUN pip install -e .
@@ -150,8 +151,8 @@ COPY <<EOF /app/start.sh
 #!/bin/bash
 set -e
 
-echo "🚀 ML Framework Docker容器启动"
-echo "=================================="
+echo "🚀 ML Framework Docker容器启动 (CUDA 13.0)"
+echo "============================================"
 
 # 检查GPU环境
 echo "🔍 检查GPU环境..."
@@ -185,15 +186,15 @@ case "\$1" in
         jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
         ;;
     "api")
-        echo "🌐 启动FastAPI服务..."
+        echo "🌐 启动FastAPI服务 (CUDA 13.0支持)..."
         uvicorn src.ml_framework.api:app --host 0.0.0.0 --port 8000
         ;;
     "streamlit")
-        echo "📊 启动Streamlit应用..."
+        echo "📊 启动Streamlit应用 (CUDA 13.0支持)..."
         streamlit run src/ml_framework/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
         ;;
     "test")
-        echo "🧪 运行测试..."
+        echo "🧪 运行测试 (CUDA 13.0环境)..."
         python test_framework.py
         python test_gpu.py
         ;;
@@ -202,7 +203,7 @@ case "\$1" in
         python -m ml_framework.cli train "\$@"
         ;;
     "shell")
-        echo "💻 启动交互式shell..."
+        echo "💻 启动交互式shell (CUDA 13.0环境)..."
         /bin/bash
         ;;
     *)

@@ -145,7 +145,23 @@ training:
     folds: 5
 ```
 
-## 📁 项目结构
+## 📚 文档
+
+- [🚀 使用指南](USAGE_GUIDE.md) - 详细使用说明
+- [🐳 Docker部署](DOCKER.md) - 容器化部署指南
+- [📁 项目结构](docs/project_structure.md) - 代码结构说明
+- [🔄 升级日志](docs/upgrades/README.md) - 版本升级记录
+
+### 🔄 最新升级 (2025-09-06)
+
+本项目已全面升级支持 **CUDA 13.0**：
+
+- ✅ **PyTorch 2.8+** - 原生支持CUDA 13.0
+- ✅ **TensorFlow 2.18+** - 最新GPU加速支持
+- ✅ **Docker环境** - 开发和生产环境全面更新
+- ✅ **依赖库** - 所有核心组件升级到最新版本
+
+**升级详情**: [🔄 CUDA 13.0升级指南](docs/upgrades/2025-09-06_CUDA_13_UPGRADE.md)
 
 ```
 ml-framework/
